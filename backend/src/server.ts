@@ -25,10 +25,8 @@ app.get("/health", (_req, res) => {
 
 app.use("/auth", authRoutes);
 
-// Protected routes
 app.use("/tasks", authMiddleware, taskRoutes);
 
-// Error middleware
 app.use(errorHandler);
 
 const PORT = env.port;

@@ -33,7 +33,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const register = async (name: string, email: string, password: string) => {
     await api.post("/auth/register", { name, email, password });
 
-    // Auto login after register
     const res = await api.post("/auth/login", { email, password });
 
     localStorage.setItem("accessToken", res.data.data.accessToken);
@@ -48,20 +47,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     router.push("/login");
   };
 
- useEffect(() => {
-  const loadUser = async () => {
-    try {
-      const res = await api.post("/auth/refresh");
-      localStorage.setItem("accessToken", res.data.data.accessToken);
-      setUser(res.data.data.user); // ✅ THIS MAKES LOGOUT APPEAR
-    } catch {
-      setUser(null);
-    }
-  };
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const res = await api.post("/auth/refresh");
+        localStorage.setItem("accessToken", res.data.data.accessToken);
+        setUser(res.data.data.user);
+      } catch {
+        setUser(null);
+      }
+    };
 
-  loadUser();
-}, []);
-
+    loadUser();
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, login, register, logout }}>
