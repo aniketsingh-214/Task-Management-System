@@ -18,16 +18,29 @@ api.interceptors.response.use(
   async (error) => {
     const original = error.config;
 
+    // 🛑 Do NOT retry refresh endpoint itself
+    if (original.url.includes("/auth/refresh")) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true;
 
-      const { data } = await api.post("/auth/refresh");
-      localStorage.setItem("accessToken", data.data.accessToken);
+      try {
+        const { data } = await api.post("/auth/refresh");
 
-      original.headers.Authorization =
-        "Bearer " + data.data.accessToken;
+        localStorage.setItem("accessToken", data.data.accessToken);
 
-      return api(original);
+        original.headers.Authorization =
+          "Bearer " + data.data.accessToken;
+
+        return api(original);
+      } catch (err) {
+        // logout user
+        localStorage.removeItem("accessToken");
+        window.location.href = "/login";
+        return Promise.reject(err);
+      }
     }
 
     return Promise.reject(error);
