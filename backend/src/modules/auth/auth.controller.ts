@@ -63,7 +63,11 @@ export const loginHandler = catchAsync(
 
 export const refreshHandler = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
-    const refreshToken = req.cookies?.[REFRESH_COOKIE_NAME] || req.body?.refreshToken;
+    // const refreshToken = req.cookies?.[REFRESH_COOKIE_NAME] || req.body?.refreshToken;
+    const refreshToken = req.cookies?.refreshToken 
+                 || req.body?.refreshToken 
+                 || req.headers["x-refresh-token"];
+
 
     const { accessToken, user } = await refreshAccessToken(refreshToken);
 
@@ -85,7 +89,11 @@ export const refreshHandler = catchAsync(
 
 export const logoutHandler = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
-    const refreshToken = req.cookies?.[REFRESH_COOKIE_NAME] || req.body?.refreshToken;
+    // const refreshToken = req.cookies?.[REFRESH_COOKIE_NAME] || req.body?.refreshToken;
+    const refreshToken = req.cookies?.refreshToken 
+                 || req.body?.refreshToken 
+                 || req.headers["x-refresh-token"];
+
 
     await logoutUser(refreshToken);
 
